@@ -4,15 +4,22 @@ package di
 import (
 	"github.com/google/wire"
 
-	"github.com/ReqqQ/SocialSphereAPI/src/ui"
+	uicommands "github.com/ReqqQ/SocialSphereAPI/src/ui/command"
+	uicontrollers "github.com/ReqqQ/SocialSphereAPI/src/ui/controllers"
 )
 
+type AppServiceInterface interface {
+	GetCommands() uicommands.CommandsInterface
+	GetControllers() uicontrollers.ControllersInterface
+}
+
 type AppService struct {
-	Controllers *ui.Controllers
+	Controllers uicontrollers.Controllers
+	Commands    uicommands.Commands
 }
 
 var (
-	AppServiceSet = wire.NewSet(provideControllers, provideAppService)
+	AppServiceSet = wire.NewSet(provideControllers, provideAppService, provideCommands)
 )
 
 func InitDIContainer() (*AppService, error) {
@@ -20,12 +27,23 @@ func InitDIContainer() (*AppService, error) {
 	return &AppService{}, nil
 }
 
-func provideControllers() *ui.Controllers {
-	return &ui.Controllers{}
+func (a AppService) GetCommands() uicommands.CommandsInterface {
+	return a.Commands
 }
 
-func provideAppService(controllers *ui.Controllers) *AppService {
+func (a AppService) GetControllers() uicontrollers.ControllersInterface {
+	return a.Controllers
+}
+
+func provideControllers() uicontrollers.Controllers {
+	return uicontrollers.Controllers{}
+}
+func provideCommands() uicommands.Commands {
+	return uicommands.Commands{}
+}
+func provideAppService(controllers uicontrollers.Controllers, commands uicommands.Commands) *AppService {
 	return &AppService{
 		Controllers: controllers,
+		Commands:    commands,
 	}
 }

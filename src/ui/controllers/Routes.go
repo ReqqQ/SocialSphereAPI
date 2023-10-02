@@ -1,4 +1,4 @@
-package ui
+package uicontrollers
 
 import (
 	"context"
@@ -11,9 +11,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type Controllers struct {
+type ControllersInterface interface {
+	InitGetRoutes(app *fiber.App)
 }
-
+type Controllers struct{}
 type UsersList struct {
 	Ids []string
 }
@@ -29,8 +30,8 @@ func InitDBData() {
 		ctx := context.Background()
 
 		client := redis.NewClient(&redis.Options{
-			Addr:     "127.0.0.1:6379",
-			Password: "127.0.0.1:6379",
+			Addr:     "redis-11093.c304.europe-west1-2.gce.cloud.redislabs.com:11093",
+			Password: "Y81lJ3sG7Cvv3YAV1k9FhS7qi3CrxYUy",
 			DB:       0,
 			PoolSize: 50,
 		})
@@ -80,7 +81,7 @@ func InitDBData() {
 }
 
 func (co Controllers) InitGetRoutes(app *fiber.App) {
-	go InitDBData()
+	//	go InitDBData()
 	v1 := app.Group("/api/v1", func(c *fiber.Ctx) error {
 		c.Set("Version", "v1")
 		return c.Next()

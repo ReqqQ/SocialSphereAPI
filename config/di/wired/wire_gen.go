@@ -9,33 +9,54 @@ package wired
 import (
 	"github.com/google/wire"
 
-	"github.com/ReqqQ/SocialSphereAPI/src/ui"
+	"github.com/ReqqQ/SocialSphereAPI/src/ui/command"
+	"github.com/ReqqQ/SocialSphereAPI/src/ui/controllers"
 )
 
 // Injectors from DIContainer.go:
 
 func InitDIContainer() (*AppService, error) {
 	controllers := provideControllers()
-	appService := provideAppService(controllers)
+	commands := provideCommands()
+	appService := provideAppService(controllers, commands)
 	return appService, nil
 }
 
 // DIContainer.go:
 
+type AppServiceInterface interface {
+	GetCommands() uicommand.CommandsInterface
+	GetControllers() uicontrollers.ControllersInterface
+}
+
 type AppService struct {
-	Controllers *ui.Controllers
+	Controllers uicontrollers.Controllers
+	Commands    uicommand.Commands
 }
 
 var (
-	AppServiceSet = wire.NewSet(provideControllers, provideAppService)
+	AppServiceSet = wire.NewSet(provideControllers, provideAppService, provideCommands)
 )
 
-func provideControllers() *ui.Controllers {
-	return &ui.Controllers{}
+func (a AppService) GetCommands() uicommand.CommandsInterface {
+	return a.Commands
 }
 
-func provideAppService(controllers *ui.Controllers) *AppService {
+func (a AppService) GetControllers() uicontrollers.ControllersInterface {
+	return a.Controllers
+}
+
+func provideControllers() uicontrollers.Controllers {
+	return uicontrollers.Controllers{}
+}
+
+func provideCommands() uicommand.Commands {
+	return uicommand.Commands{}
+}
+
+func provideAppService(controllers uicontrollers.Controllers, commands uicommand.Commands) *AppService {
 	return &AppService{
 		Controllers: controllers,
+		Commands:    commands,
 	}
 }
