@@ -6,7 +6,8 @@ import (
 
 func main() {
 	app := config.Init()
-	config.App.GetCommands().GetSyncDBCommand().SyncDB()
-	config.App.Controllers.InitGetRoutes(app)
+	config.InitCQRS()
+	//config.App.GetCommands().GetSyncDBCommand().SyncDB()
+	config.App.GetControllers().InitGetRoutes(app)
 	config.Start(app)
 }

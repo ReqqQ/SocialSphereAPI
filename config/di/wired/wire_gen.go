@@ -9,6 +9,7 @@ package wired
 import (
 	"github.com/google/wire"
 
+	"github.com/ReqqQ/SocialSphereAPI/src/infrastructure/bus"
 	"github.com/ReqqQ/SocialSphereAPI/src/ui/command"
 	"github.com/ReqqQ/SocialSphereAPI/src/ui/controllers"
 )
@@ -18,7 +19,9 @@ import (
 func InitDIContainer() (*AppService, error) {
 	controllers := provideControllers()
 	commands := provideCommands()
-	appService := provideAppService(controllers, commands)
+	queryHandler := provideQueryHandler()
+	commandHandler := provideCommandHandler()
+	appService := provideAppService(controllers, commands, queryHandler, commandHandler)
 	return appService, nil
 }
 
@@ -27,19 +30,31 @@ func InitDIContainer() (*AppService, error) {
 type AppServiceInterface interface {
 	GetCommands() uicommand.CommandsInterface
 	GetControllers() uicontrollers.ControllersInterface
+	GetQueryHandlers() infrastructurebus.QueryHandlerInterface
+	GetCommandHandlers() infrastructurebus.CommandHandlerInterface
 }
 
 type AppService struct {
-	Controllers uicontrollers.Controllers
-	Commands    uicommand.Commands
+	Controllers    uicontrollers.Controllers
+	Commands       uicommand.Commands
+	QueryHandler   infrastructurebus.QueryHandler
+	CommandHandler infrastructurebus.CommandHandler
 }
 
 var (
-	AppServiceSet = wire.NewSet(provideControllers, provideAppService, provideCommands)
+	AppServiceSet = wire.NewSet(provideControllers, provideAppService, provideCommands, provideQueryHandler, provideCommandHandler)
 )
 
 func (a AppService) GetCommands() uicommand.CommandsInterface {
 	return a.Commands
+}
+
+func (a AppService) GetQueryHandlers() infrastructurebus.QueryHandlerInterface {
+	return a.QueryHandler
+}
+
+func (a AppService) GetCommandHandlers() infrastructurebus.CommandHandlerInterface {
+	return a.CommandHandler
 }
 
 func (a AppService) GetControllers() uicontrollers.ControllersInterface {
@@ -54,9 +69,19 @@ func provideCommands() uicommand.Commands {
 	return uicommand.Commands{}
 }
 
-func provideAppService(controllers uicontrollers.Controllers, commands uicommand.Commands) *AppService {
+func provideQueryHandler() infrastructurebus.QueryHandler {
+	return infrastructurebus.QueryHandler{}
+}
+
+func provideCommandHandler() infrastructurebus.CommandHandler {
+	return infrastructurebus.CommandHandler{}
+}
+
+func provideAppService(controllers uicontrollers.Controllers, commands uicommand.Commands, queryHandler infrastructurebus.QueryHandler, commandHandler infrastructurebus.CommandHandler) *AppService {
 	return &AppService{
-		Controllers: controllers,
-		Commands:    commands,
+		Controllers:    controllers,
+		Commands:       commands,
+		QueryHandler:   queryHandler,
+		CommandHandler: commandHandler,
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/ReqqQ/SocialSphereAPI/config/di/wired"
+	infrastructurebus "github.com/ReqqQ/SocialSphereAPI/src/infrastructure/bus"
+	infrastructureuser "github.com/ReqqQ/SocialSphereAPI/src/infrastructure/user"
 )
 
 var (
@@ -24,4 +26,10 @@ func Init() *fiber.App {
 
 func Start(app *fiber.App) {
 	app.Listen(":3000")
+}
+
+func InitCQRS() {
+	infrastructurebus.QueryHandlerList = map[string]infrastructurebus.RepositoryHandlerInterface{
+		"GetUserQuery": &infrastructureuser.UserRepository{},
+	}
 }
